@@ -1,0 +1,10 @@
+Url = https://restful-booker.herokuapp.com
+ 
+Request Headers = Cookie=token=513cab61b6a397f
+Authorisationoptional=Basic
+Accept=*/*
+Content-Type=application/json; charset=UTF-8
+ 
+Request Body = null
+ 
+Response Body = Created

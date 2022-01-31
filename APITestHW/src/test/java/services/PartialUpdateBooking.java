@@ -2,42 +2,26 @@ package services;
 
 import io.qameta.allure.Allure;
 import io.restassured.RestAssured;
-import static io.restassured.RestAssured.given;
-
 import io.restassured.http.ContentType;
 import io.restassured.internal.RequestSpecificationImpl;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.DataProvider;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class Delete_Created_Booking {
-    @BeforeTest
-    public String postCrateToken(){
-        RestAssured.baseURI ="https://restful-booker.herokuapp.com";
-        RequestSpecification request = RestAssured.given();
-        String postData= "{\n" +
-                "    \"username\" : \"admin\",\n" +
-                "    \"password\" : \"password123\"\n" +
-                "}";
+import static io.restassured.RestAssured.given;
 
+public class PartialUpdateBooking {
+    String Booking_id;
 
-        Response response =request.header("content-type", "application/json")
-                .body(postData)
-                .post("/auth");
-        response.then().log().all();
-
-        String jsonString = response.getBody().asString();
-        String result= JsonPath.from(jsonString).getString("token");
-        System.out.println("token_response: "+result);
-
-
-        return result;
-
+    public PartialUpdateBooking(String booking_id) {
+         this.Booking_id= "Bookingid";
     }
-    public int Create_Booking(){
+
+    @BeforeClass
+    public void Create_Booking(){
 
         RestAssured.baseURI ="https://restful-booker.herokuapp.com";
         RequestSpecification request = given();
@@ -59,45 +43,44 @@ public class Delete_Created_Booking {
                 .post("/booking");
         response.then().log().all();
 
-
         String jsonString = response.getBody().asString();
-        int Booking_id = JsonPath.from(jsonString).get("bookingid");
+        Booking_id = JsonPath.from(jsonString).getString("bookingid");
         System.out.println("booking_id: " + Booking_id);
 
+        Booking_id= this.Booking_id;
 
-        return Booking_id;
+
+    }
+    @Test
+    public void Show_Partial_Updated_Booking(){
 
 
+        given().log().all().header("Accept","application/json")
+                .get("https://restful-booker.herokuapp.com/booking/{bookingID}", Booking_id)
+                .then().log().all();
 
 
     }
 
-    @DataProvider(name = "dataProvider")
-    public Object[][] dataProvider ()
-    {
-        return new Object[][]{
-                {postCrateToken(), Create_Booking()}
-
-        };
-    }
-
-    @Test(dataProvider = "dataProvider")
-
-    public void deleteBooking( String Token, int booking){
+    @AfterClass
+    public void Partial_Update_Booking(){
+        String Token= "998c15d9577831f";
+        String data ="{\n" +
+                "    \"firstname\": \"update\",\n" +
+                "    \"lastname\" : \"booking\" \n" +
+                "}";
         RestAssured.baseURI ="https://restful-booker.herokuapp.com";
         RequestSpecification request = RestAssured.given();
         Response response= request.log().all()
-                .contentType(ContentType.JSON)
+                .header("Accept", "application/json")
                 .header("Cookie","token=" + Token)
-                .header("Authorisationoptional","Basic")
+                .header("Authorisation","Basic")
+                .contentType(ContentType.JSON)
+                .body(data)
                 .when()
-                .delete("https://restful-booker.herokuapp.com/booking/{bookingID}\n",booking);
-                response.then()
-                .log().all()
-                .statusCode(201);
+                .patch("https://restful-booker.herokuapp.com/booking/{bookingID}",Booking_id);
+                response.then().log().all();
         attachment(request, RestAssured.baseURI, response);
-
-
 
 
 

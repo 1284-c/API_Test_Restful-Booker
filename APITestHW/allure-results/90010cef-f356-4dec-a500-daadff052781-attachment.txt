@@ -1,0 +1,17 @@
+Url = https://restful-booker.herokuapp.com
+ 
+Request Headers = Accept=application/json
+Content-Type=application/json; charset=UTF-8
+ 
+Request Body = {
+    "firstname" : "test",
+    "lastname" : "automation", 
+    "totalprice" : 500,
+    "depositpaid" : true  ,
+    "bookingdates" :  { 
+    "checkin" : "2018-01-01",
+    "checkout" : "2019-01-01"  } ,
+    "additionalneeds" : "Breakfast"
+}
+ 
+Response Body = {"bookingid":81,"booking":{"firstname":"test","lastname":"automation","totalprice":500,"depositpaid":true,"bookingdates":{"checkin":"2018-01-01","checkout":"2019-01-01"},"additionalneeds":"Breakfast"}}

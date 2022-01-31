@@ -1,0 +1,11 @@
+Url = https://restful-booker.herokuapp.com
+ 
+Request Headers = Accept=*/*
+Content-Type=application/json; charset=UTF-8
+ 
+Request Body = {
+    "username" : "admin",
+    "password" : "password123"
+}
+ 
+Response Body = {"token":"513cab61b6a397f"}

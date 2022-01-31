@@ -1,0 +1,13 @@
+Url = https://restful-booker.herokuapp.com
+ 
+Request Headers = Accept=application/json
+Cookie=token=998c15d9577831f
+Authorisation=Basic
+Content-Type=application/json; charset=UTF-8
+ 
+Request Body = {
+    "firstname": "update",
+    "lastname" : "booking" 
+}
+ 
+Response Body = Forbidden

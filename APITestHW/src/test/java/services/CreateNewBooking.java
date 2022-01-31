@@ -1,7 +1,9 @@
 package services;
 
+import io.qameta.allure.Allure;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.internal.RequestSpecificationImpl;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -12,9 +14,8 @@ import static org.hamcrest.Matchers.startsWith;
 
 public class CreateNewBooking  {
 
-
     @Test
-    public String Post_Create_Booking(){
+    public void Post_Create_Booking(){
 
 
         RestAssured.baseURI ="https://restful-booker.herokuapp.com";
@@ -35,7 +36,7 @@ public class CreateNewBooking  {
                 .body(body_data)
                 .when()
                 .post("/booking");
-                response.then().log().all();
+        response.then().log().all();
         response.then().statusCode(200)
                 .body("booking.firstname",equalTo("cerenay"))
                 .body("booking.lastname",equalTo("coskun"))
@@ -45,9 +46,17 @@ public class CreateNewBooking  {
         String jsonString = response.getBody().asString();
         String Booking_id = JsonPath.from(jsonString).getString("bookingid");
         System.out.println("booking_id: " + Booking_id);
+        attachment(request, RestAssured.baseURI, response);
 
-        return Booking_id;
 
+    }
 
+    public String attachment(RequestSpecification httpRequest, String baseURI, Response response) {
+        String html = "Url = " + baseURI + "\n \n" +
+                "Request Headers = " + ((RequestSpecificationImpl) httpRequest).getHeaders() + "\n \n" +
+                "Request Body = " + ((RequestSpecificationImpl) httpRequest).getBody() + "\n \n" +
+                "Response Body = " + response.getBody().asString();
+        Allure.addAttachment("Request Detail", html);
+        return html;
     }
 }
