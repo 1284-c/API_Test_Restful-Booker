@@ -1,7 +1,9 @@
 package services;
 
+import io.qameta.allure.Allure;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.internal.RequestSpecificationImpl;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -104,10 +106,15 @@ public class UpdateCreatedBooking {
         response.then().statusCode(200)
                 .body("firstname",startsWith("Cer"))
                 .body("totalprice",equalTo(550));
+        attachment(request, RestAssured.baseURI, response);
 
-
-
-
-
+    }
+    public String attachment(RequestSpecification httpRequest, String baseURI, Response response) {
+        String html = "Url = " + baseURI + "\n \n" +
+                "Request Headers = " + ((RequestSpecificationImpl) httpRequest).getHeaders() + "\n \n" +
+                "Request Body = " + ((RequestSpecificationImpl) httpRequest).getBody() + "\n \n" +
+                "Response Body = " + response.getBody().asString();
+        Allure.addAttachment("Request Detail", html);
+        return html;
     }
 }

@@ -1,7 +1,9 @@
 package services;
 
+import io.qameta.allure.Allure;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.internal.RequestSpecificationImpl;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -67,19 +69,28 @@ public class PartialUpdateBooking {
                 "    \"firstname\": \"update\",\n" +
                 "    \"lastname\" : \"booking\" \n" +
                 "}";
-        given().log().all()
+        RestAssured.baseURI ="https://restful-booker.herokuapp.com";
+        RequestSpecification request = RestAssured.given();
+        Response response= request.log().all()
                 .header("Accept", "application/json")
                 .header("Cookie","token=" + Token)
                 .header("Authorisation","Basic")
                 .contentType(ContentType.JSON)
                 .body(data)
                 .when()
-                .patch("https://restful-booker.herokuapp.com/booking/{bookingID}",Booking_id)
-                .then().log().all();
+                .patch("https://restful-booker.herokuapp.com/booking/{bookingID}",Booking_id);
+                response.then().log().all();
+        attachment(request, RestAssured.baseURI, response);
 
 
 
-
-
+    }
+    public String attachment(RequestSpecification httpRequest, String baseURI, Response response) {
+        String html = "Url = " + baseURI + "\n \n" +
+                "Request Headers = " + ((RequestSpecificationImpl) httpRequest).getHeaders() + "\n \n" +
+                "Request Body = " + ((RequestSpecificationImpl) httpRequest).getBody() + "\n \n" +
+                "Response Body = " + response.getBody().asString();
+        Allure.addAttachment("Request Detail", html);
+        return html;
     }
 }

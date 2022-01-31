@@ -1,9 +1,11 @@
 package services;
 
+import io.qameta.allure.Allure;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
 
 import io.restassured.http.ContentType;
+import io.restassured.internal.RequestSpecificationImpl;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -30,6 +32,7 @@ public class Delete_Created_Booking {
         String jsonString = response.getBody().asString();
         String result= JsonPath.from(jsonString).getString("token");
         System.out.println("token_response: "+result);
+
 
         return result;
 
@@ -61,7 +64,9 @@ public class Delete_Created_Booking {
         int Booking_id = JsonPath.from(jsonString).get("bookingid");
         System.out.println("booking_id: " + Booking_id);
 
+
         return Booking_id;
+
 
 
 
@@ -79,18 +84,30 @@ public class Delete_Created_Booking {
     @Test(dataProvider = "dataProvider")
 
     public void deleteBooking( String Token, int booking){
-        given().log().all()
+        RestAssured.baseURI ="https://restful-booker.herokuapp.com";
+        RequestSpecification request = RestAssured.given();
+        Response response= request.log().all()
                 .contentType(ContentType.JSON)
                 .header("Cookie","token=" + Token)
                 .header("Authorisationoptional","Basic")
                 .when()
-                .delete("https://restful-booker.herokuapp.com/booking/{bookingID}\n",booking)
-                .then()
+                .delete("https://restful-booker.herokuapp.com/booking/{bookingID}\n",booking);
+                response.then()
                 .log().all()
                 .statusCode(201);
+        attachment(request, RestAssured.baseURI, response);
 
 
 
 
+
+    }
+    public String attachment(RequestSpecification httpRequest, String baseURI, Response response) {
+        String html = "Url = " + baseURI + "\n \n" +
+                "Request Headers = " + ((RequestSpecificationImpl) httpRequest).getHeaders() + "\n \n" +
+                "Request Body = " + ((RequestSpecificationImpl) httpRequest).getBody() + "\n \n" +
+                "Response Body = " + response.getBody().asString();
+        Allure.addAttachment("Request Detail", html);
+        return html;
     }
 }
