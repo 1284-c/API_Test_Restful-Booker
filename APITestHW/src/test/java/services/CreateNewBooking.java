@@ -12,9 +12,8 @@ import static org.hamcrest.Matchers.startsWith;
 
 public class CreateNewBooking  {
 
-
     @Test
-    public String Post_Create_Booking(){
+    public void Post_Create_Booking(){
 
 
         RestAssured.baseURI ="https://restful-booker.herokuapp.com";
@@ -35,7 +34,7 @@ public class CreateNewBooking  {
                 .body(body_data)
                 .when()
                 .post("/booking");
-                response.then().log().all();
+        response.then().log().all();
         response.then().statusCode(200)
                 .body("booking.firstname",equalTo("cerenay"))
                 .body("booking.lastname",equalTo("coskun"))
@@ -46,7 +45,6 @@ public class CreateNewBooking  {
         String Booking_id = JsonPath.from(jsonString).getString("bookingid");
         System.out.println("booking_id: " + Booking_id);
 
-        return Booking_id;
 
 
     }

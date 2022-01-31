@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class CreateToken {
     @Test
-    public String postCrateToken(){
+    public void postCrateToken(){
         RestAssured.baseURI ="https://restful-booker.herokuapp.com";
         RequestSpecification request = RestAssured.given();
         String postData= "{\n" +
@@ -26,7 +26,7 @@ public class CreateToken {
         String result= JsonPath.from(jsonString).getString("token");
         System.out.println("token_response: "+result);
 
-        return result;
+
 
     }
 }

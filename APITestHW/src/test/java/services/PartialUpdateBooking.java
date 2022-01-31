@@ -5,18 +5,21 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
 
-public class ShowBookingWithID  {
+public class PartialUpdateBooking {
+    String Booking_id;
 
+    public PartialUpdateBooking(String booking_id) {
+         this.Booking_id= "Bookingid";
+    }
 
     @BeforeClass
-    public int Create_Booking(){
+    public void Create_Booking(){
 
         RestAssured.baseURI ="https://restful-booker.herokuapp.com";
         RequestSpecification request = given();
@@ -38,35 +41,43 @@ public class ShowBookingWithID  {
                 .post("/booking");
         response.then().log().all();
 
-
         String jsonString = response.getBody().asString();
-        int Booking_id = JsonPath.from(jsonString).get("bookingid");
+        Booking_id = JsonPath.from(jsonString).getString("bookingid");
         System.out.println("booking_id: " + Booking_id);
 
-        return Booking_id;
+        Booking_id= this.Booking_id;
 
+
+    }
+    @Test
+    public void Show_Partial_Updated_Booking(){
+
+
+        given().log().all().header("Accept","application/json")
+                .get("https://restful-booker.herokuapp.com/booking/{bookingID}", Booking_id)
+                .then().log().all();
 
 
     }
 
-    @DataProvider(name = "dataProvider")
-    public Object[][] dataProvider ()
-    {
-        return new Object[][]{
-                {Create_Booking(),200}
+    @AfterClass
+    public void Partial_Update_Booking(){
+        String Token= "998c15d9577831f";
+        String data ="{\n" +
+                "    \"firstname\": \"update\",\n" +
+                "    \"lastname\" : \"booking\" \n" +
+                "}";
+        given().log().all()
+                .header("Accept", "application/json")
+                .header("Cookie","token=" + Token)
+                .header("Authorisation","Basic")
+                .contentType(ContentType.JSON)
+                .body(data)
+                .when()
+                .patch("https://restful-booker.herokuapp.com/booking/{bookingID}",Booking_id)
+                .then().log().all();
 
-        };
-    }
 
-    @Test(dataProvider = "dataProvider")
-    public void ShowBooking(int bookingID, int StatusCode){
-        RestAssured.baseURI ="https://restful-booker.herokuapp.com";
-        RequestSpecification request = RestAssured.given();
-        System.out.println("Get Booking for booking id: " +bookingID);
-
-        Response response = request.log().all().header("Accept","application/json")
-                .get("https://restful-booker.herokuapp.com/booking/{bookingID}", bookingID);
-        response.then().log().all();
 
 
 
